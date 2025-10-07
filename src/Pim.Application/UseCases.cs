@@ -68,3 +68,37 @@ public class UpdateProductAttributesInteractor : IUpdateProductAttributes
         product.UpdateAttributes(typology, command.Attributes);
     }
 }
+
+
+public interface IGetProductByEan
+{
+    Task<Product?> ExecuteAsync(string ean, CancellationToken ct = default);
+}
+
+public class GetProductByEanInteractor : IGetProductByEan
+{
+    private readonly IProductRepository _products;
+    public GetProductByEanInteractor(IProductRepository products) { _products = products; }
+    public Task<Product?> ExecuteAsync(string ean, CancellationToken ct = default) => _products.GetByEanAsync(ean, ct);
+}
+
+
+public record ProductsQuery(string? TypologyCode);
+
+public interface IListProducts
+{
+    Task<IReadOnlyCollection<Product>> ExecuteAsync(ProductsQuery query, CancellationToken ct = default);
+}
+
+public class ListProductsInteractor : IListProducts
+{
+    private readonly IProductRepository _products;
+    public ListProductsInteractor(IProductRepository products) { _products = products; }
+
+    public async Task<IReadOnlyCollection<Product>> ExecuteAsync(ProductsQuery query, CancellationToken ct = default)
+    {
+        if (!string.IsNullOrWhiteSpace(query.TypologyCode))
+            return await _products.ListByTypologyAsync(query.TypologyCode!, ct);
+        return await _products.ListAsync(ct);
+    }
+}

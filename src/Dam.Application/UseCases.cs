@@ -1,5 +1,4 @@
-
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Dam.Domain;
 using Mdm.Core;
 
@@ -23,6 +22,7 @@ public class UploadMediaBatchInteractor : IUploadMediaBatch
     private readonly IMediaRepository _repo;
     private readonly IEnumerable<IMediaHandler> _handlers;
     private readonly IEventPublisher _events;
+
     public UploadMediaBatchInteractor(IMediaRepository repo, IEnumerable<IMediaHandler> handlers, IEventPublisher events)
     {
         _repo = repo; _handlers = handlers; _events = events;
@@ -35,6 +35,7 @@ public class UploadMediaBatchInteractor : IUploadMediaBatch
             var (ean, sku, fmt) = Parse(file);
             var media = new Media(Guid.NewGuid(), file, ean, sku, fmt);
             await _repo.AddAsync(media, ct);
+
             foreach (var h in _handlers.Where(h => h.CanHandle(fmt)))
                 await h.ProcessAsync(media, ct);
 
@@ -44,7 +45,7 @@ public class UploadMediaBatchInteractor : IUploadMediaBatch
 
     private static (string ean, string sku, string format) Parse(string file)
     {
-        // Example: EAN12345_SKU56789_front.jpg
+        // EAN12345_SKU56789_front.jpg
         var name = Path.GetFileName(file);
         var match = Regex.Match(name, @"EAN(?<ean>\w+)_SKU(?<sku>\w+).*?\.(?<ext>\w+)$", RegexOptions.IgnoreCase);
         if (!match.Success) throw new InvalidOperationException($"Bad filename: {file}");
@@ -62,7 +63,7 @@ public class AutoLinkMediaByCodesInteractor : IAutoLinkMediaByCodes, IEventSubsc
         foreach (var f in command.FileNames)
         {
             var name = Path.GetFileName(f);
-            var match = System.Text.RegularExpressions.Regex.Match(name, @"EAN(?<ean>\w+)_SKU(?<sku>\w+)", RegexOptions.IgnoreCase);
+            var match = Regex.Match(name, @"EAN(?<ean>\w+)_SKU(?<sku>\w+)", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 var media = await _repo.GetByFileNameAsync(name, ct);
@@ -74,7 +75,7 @@ public class AutoLinkMediaByCodesInteractor : IAutoLinkMediaByCodes, IEventSubsc
         }
     }
 
-    // IMediaLinkService port (used by MDM Core orchestrator)
+    // IMediaLinkService
     public async Task LinkAsync(string ean, string sku, string fileName, CancellationToken ct = default)
     {
         var media = await _repo.GetByFileNameAsync(fileName, ct);
@@ -82,12 +83,54 @@ public class AutoLinkMediaByCodesInteractor : IAutoLinkMediaByCodes, IEventSubsc
         await _repo.AddLinkAsync(new MediaLink(Guid.NewGuid(), ean, sku, media.Id), ct);
     }
 
-    // IEventSubscriber (react to MediaUploaded)
+    // IEventSubscriber
     public async Task HandleAsync(Mdm.Core.IEvent @event, CancellationToken ct = default)
     {
         if (@event is Mdm.Core.MediaUploaded m)
         {
             await LinkAsync(m.Ean, m.Sku, m.FileName, ct);
         }
+    }
+}
+
+// ---- Consultation des liens ----
+public record GetMediaLinksQuery(string Ean, string? Sku);
+
+public interface IGetMediaLinksForProduct
+{
+    Task<IReadOnlyCollection<MediaLink>> ExecuteAsync(GetMediaLinksQuery query, CancellationToken ct = default);
+}
+
+public class GetMediaLinksForProductInteractor : IGetMediaLinksForProduct
+{
+    private readonly IMediaRepository _repo;
+    public GetMediaLinksForProductInteractor(IMediaRepository repo) { _repo = repo; }
+
+    public async Task<IReadOnlyCollection<MediaLink>> ExecuteAsync(GetMediaLinksQuery query, CancellationToken ct = default)
+    {
+        if (!string.IsNullOrWhiteSpace(query.Sku))
+            return await _repo.GetLinksByEanAndSkuAsync(query.Ean, query.Sku!, ct);
+        return await _repo.GetLinksByEanAsync(query.Ean, ct);
+    }
+}
+
+// ---- Listing médias ----
+public record MediaQuery(string? Format);
+
+public interface IListMedia
+{
+    Task<IReadOnlyCollection<Media>> ExecuteAsync(MediaQuery query, CancellationToken ct = default);
+}
+
+public class ListMediaInteractor : IListMedia
+{
+    private readonly IMediaRepository _repo;
+    public ListMediaInteractor(IMediaRepository repo) { _repo = repo; }
+
+    public async Task<IReadOnlyCollection<Media>> ExecuteAsync(MediaQuery query, CancellationToken ct = default)
+    {
+        if (!string.IsNullOrWhiteSpace(query.Format))
+            return await _repo.ListByFormatAsync(query.Format!, ct);
+        return await _repo.ListAsync(ct);
     }
 }

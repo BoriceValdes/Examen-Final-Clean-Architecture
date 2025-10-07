@@ -1,8 +1,7 @@
-
+using Mdm.Core;
 using Pim.Application;
 using Pim.Domain;
 using Pim.Infrastructure.InMemory;
-using Mdm.Core;
 using Xunit;
 
 public class DummyBus : IEventPublisher
