@@ -168,5 +168,6 @@ dotnet run --project src/Mdm.Api
 Endpoints (extraits) :
 - `POST /api/pim/products` (role: admin) — crée un produit selon une typologie.  
 - `POST /api/dam/media/upload` — upload simulé (métadonnées) + auto‑link.
+- `Lien du projet:` http://localhost:49370/swagger/index.html
 
 ---
