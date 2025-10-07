@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+      <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+      </PropertyGroup>
+      <ItemGroup>
+        <ProjectReference Include="..\Pim.Application\Pim.Application.csproj" />
+    <ProjectReference Include="..\Pim.Domain\Pim.Domain.csproj" />
+    <ProjectReference Include="..\Mdm.Core\Mdm.Core.csproj" />
+    <ProjectReference Include="..\Dam.Application\Dam.Application.csproj" />
+    <ProjectReference Include="..\Dam.Domain\Dam.Domain.csproj" />
+      </ItemGroup>
+      <ItemGroup>
+  <PackageReference Include="xunit" Version="2.9.0" />
+  <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  </PackageReference>
+  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+</ItemGroup>
+    </Project>

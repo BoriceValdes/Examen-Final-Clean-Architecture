@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dam.Application\Dam.Application.csproj" />
+<ProjectReference Include="..\Dam.Domain\Dam.Domain.csproj" />
+<ProjectReference Include="..\Mdm.Core\Mdm.Core.csproj" />
+  </ItemGroup>
+
+</Project>

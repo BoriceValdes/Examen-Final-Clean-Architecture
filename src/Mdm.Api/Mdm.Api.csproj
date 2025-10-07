@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Pim.Application\Pim.Application.csproj" />
+<ProjectReference Include="..\Pim.Domain\Pim.Domain.csproj" />
+<ProjectReference Include="..\Pim.Infrastructure.InMemory\Pim.Infrastructure.InMemory.csproj" />
+<ProjectReference Include="..\Dam.Application\Dam.Application.csproj" />
+<ProjectReference Include="..\Dam.Domain\Dam.Domain.csproj" />
+<ProjectReference Include="..\Dam.Infrastructure.InMemory\Dam.Infrastructure.InMemory.csproj" />
+<ProjectReference Include="..\Mdm.Core\Mdm.Core.csproj" />
+  </ItemGroup>
+
+</Project>
