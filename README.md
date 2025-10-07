@@ -68,7 +68,7 @@ Limiter la **fragilité** : isoler logique métier, utiliser **builders**/**fixt
 
 ---
 
-## Partie 2 — Étude de cas & conception (30 pts)
+## Partie 2 — Étude de cas & conception
 
 ### C1. Modélisation (10 pts)
 
@@ -110,19 +110,19 @@ Flux **upload média → association** : `UploadMediaBatch` (DAM) → **parse** 
 
 **Entités clés** : `Product`, `Typology`, `DynamicAttribute` (PIM) ; `Media`, `MediaFormat`, `MediaLink` (DAM).
 
-### C2. Justification des choix (10 pts)
+### C2. Justification des choix
 - **DIP/OCP** : nouveaux formats média = nouveaux **handlers** implémentant `IMediaHandler` **sans** modifier `UploadMediaBatch`; nouvelles typologies = nouvelles **FormDefinitions** data‑driven.  
 - **ADP** : PIM et DAM **ne se réfèrent pas** directement l’un à l’autre ; ils dépendent de **`Mdm.Core`** (ports/événements).  
 - **Tests avec mocks** : Use cases testés contre `IProductRepository`, `ITypologyRepository`, `IMediaRepository`, `IEventPublisher` (faux).
 
-### C3. Découpage en composants (10 pts)
+### C3. Découpage en composants
 - **Modules** : `Pim.*`, `Dam.*`, `Mdm.Core`, `Mdm.Api`.  
 - **Cohésion (REP/CCP/CRP)** : chaque module regroupe classes qui changent ensemble ; domaines séparés évitent l’**utilisation parasite**.  
 - **Couplage (ADP/SDP/SAP)** : dépendances dirigées vers `Mdm.Core` (abstrait, stable). Pas de cycle.
 
 ---
 
-## Partie 3 — Réalisation pratique (.NET 8) (40 pts)
+## Partie 3 — Réalisation pratique (.NET 8)
 
 ### Modélisation — Cas d’usage
 - **PIM**  
@@ -170,5 +170,3 @@ Endpoints (extraits) :
 - `POST /api/dam/media/upload` — upload simulé (métadonnées) + auto‑link.
 
 ---
-
-© Corrigé pédagogique — utilisation libre en contexte d’enseignement.
